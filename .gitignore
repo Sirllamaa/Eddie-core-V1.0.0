@@ -1,11 +1,12 @@
+# Ignore llms
+models/
+
 # Ignore virtual environment
 .venv/
 venv/
 
 # Ignore environment variable files
 .env
-.env.*
-
 # Bytecode
 __pycache__/
 *.py[cod]
