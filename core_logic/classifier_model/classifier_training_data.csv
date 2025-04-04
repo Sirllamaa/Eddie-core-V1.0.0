@@ -1,0 +1,8 @@
+text,label
+yes,QUANTIZED_LLAMA
+turn on the lights,QUANTIZED_LLAMA
+what is 2 + 2,QUANTIZED_LLAMA
+how do rockets work,LLAMA_GPU
+explain LSTM networks,CLOUD_GPT
+write a poem about love,CLOUD_GPT
+tell me a story about a space empire, LLAMA_GPU
