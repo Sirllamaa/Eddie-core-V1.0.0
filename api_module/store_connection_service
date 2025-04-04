@@ -1,0 +1,8 @@
+from fastapi import HTTPException
+import requests
+from jose import jwt
+import os
+from datetime import datetime
+
+class StoreService:
+    def __init__(self, store_base_url="")
