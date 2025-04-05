@@ -5,7 +5,7 @@ from auth_module.auth_handler import create_access_token, get_current_user
 from auth_module.auth_models import Token, User
 from auth_module.user_store import authenticate_user
 # from assist.ollama_assist import query_llama
-from config import SECRET_KEY, ALGORITHM
+from config import USER_AUTH_KEY, USER_AUTH_ALGORITHM
 from jose import JWTError, jwt
 from pydantic import BaseModel
 
@@ -27,14 +27,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    # OPTIONAL: verify user still exists in DB
+    # verify user still exists in DB
     token = create_access_token({"sub": user.username, "role": user.role})
     return {"access_token": token, "token_type": "bearer"}
 
 @v1_router.get("/me")
 def read_current_user(current_user: User = Depends(get_current_user), token: str = Depends(oauth2_scheme)):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, USER_AUTH_KEY, algorithms=[USER_AUTH_ALGORITHM])
         return {
             "username": current_user.username,
             "role": current_user.role,
@@ -60,7 +60,7 @@ async def process_input(
     current_user=Depends(get_current_user)
 ):
     try:
-        pass
+        raise HTTPException(status_code=500, detail=f"LLaMA API error: {e}")
         # result = query_llama(request.input_text, system_prompt=request.system_prompt)
         # return {"output_text": result}
     except Exception as e:

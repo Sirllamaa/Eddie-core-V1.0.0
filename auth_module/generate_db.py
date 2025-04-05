@@ -1,6 +1,8 @@
 import os
+import sys
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))  # Adjust path to import auth_module
 from auth_module.auth_models import Base, UserDB
 from auth_module.user_store import hash_password
 
