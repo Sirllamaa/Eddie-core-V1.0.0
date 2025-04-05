@@ -31,6 +31,8 @@ def get_user(username: str):
     return user
 
 def authenticate_user(username: str, password: str) -> Optional[User]:
+    print(f"Authenticating user: {username}")  # Debugging line
+    print(f"Password: {password}")  # Debugging line
     db = SessionLocal()
     user = db.query(UserDB).filter(UserDB.username == username).first()
     db.close()

@@ -2,12 +2,12 @@ import requests
 import json
 
 OLLAMA_HOST = "http://localhost:11434"
-MODEL_NAME = "llama3.1:latest"
+MODEL_NAME = "artifish/llama3.2-uncensored:latest"
 
 # Conversation history – you can append to this across turns
 chat_history = []
 
-def chat_with_llama(user_message: str, system_prompt: str = None):
+def query_llama(user_message: str, system_prompt: str = None):
     headers = {"Content-Type": "application/json"}
 
     # Build message list
@@ -48,4 +48,4 @@ if __name__ == "__main__":
         user_input = input("\nYou: ")
         if user_input.lower() in ["exit", "quit"]:
             break
-        chat_with_llama(user_input, system_prompt)
+        query_llama(user_input, system_prompt)

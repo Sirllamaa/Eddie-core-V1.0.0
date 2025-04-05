@@ -4,7 +4,7 @@ from api_module.models import UserInput, CoreResponse
 from auth_module.auth_handler import create_access_token, get_current_user
 from auth_module.auth_models import Token, User
 from auth_module.user_store import authenticate_user
-# from assist.ollama_assist import query_llama
+from core_logic.query_handler import query
 from config import USER_AUTH_KEY, USER_AUTH_ALGORITHM
 from jose import JWTError, jwt
 from pydantic import BaseModel
@@ -23,7 +23,10 @@ v1_router = APIRouter(prefix="/core/api/v1")
 
 @v1_router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    print(f"Login attempt for user: {form_data.username}")  # Debugging line
+    print(f"Password: {form_data.password}")  # Debugging line
     user = authenticate_user(form_data.username, form_data.password)
+    print(f"User: {user}") # Debugging line
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
@@ -57,11 +60,12 @@ class ProcessResponse(BaseModel):
 @v1_router.post("/process", response_model=ProcessResponse)
 async def process_input(
     request: ProcessRequest,
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
+    token: str = Depends(oauth2_scheme)
 ):
     try:
-        raise HTTPException(status_code=500, detail=f"LLaMA API error: {e}")
-        # result = query_llama(request.input_text, system_prompt=request.system_prompt)
-        # return {"output_text": result}
+        payload = jwt.decode(token, USER_AUTH_KEY, algorithms=[USER_AUTH_ALGORITHM])
+        result = query(request.input_text)
+        return {"output_text": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLaMA API error: {e}")
