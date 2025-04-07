@@ -1,17 +1,18 @@
 import requests
 import json
 import os
+from config import OPENAI_API_KEY
 
 # Default configs
 OLLAMA_HOST = "http://localhost:11434"
 OLLAMA_MODEL = "llama3:latest"
 OPENAI_MODEL = "gpt-4o"
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = OPENAI_API_KEY
 
 # Shared conversation history (can later be made per-user)
 chat_history = []
 
-def query_llm(user_message: str, system_prompt: str = None, backend: str = "ollama") -> str:
+def query_llm(user_message: str, system_prompt: str = None, backend: str = "openai") -> str:
     if backend == "openai":
         return query_openai(user_message, system_prompt)
     elif backend == "ollama":

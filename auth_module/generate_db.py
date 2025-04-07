@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))  # Adjust path to import auth_module
 from auth_module.auth_models import Base, UserDB
 from auth_module.user_store import hash_password
+from config import SYSTEM_USER_PASSWORD
 
 # Database path inside auth_module
 DB_PATH = os.path.join(os.path.dirname(__file__), "eddie_users.db")
@@ -61,6 +62,21 @@ def add_user_prompt():
     db.commit()
     print(f"[+] User '{username}' added with role '{role}'.")
 
+def add_system_user_prompt():
+    db = get_db_session()
+    
+    if db.query(UserDB).filter(UserDB.username == "system").first():
+        print(f"[!] System user already exists.")
+        return
+    
+    hashed = hash_password(SYSTEM_USER_PASSWORD)
+    user = UserDB(username="system", hashed_password=hashed, role="system")
+    db.add(user)
+    db.commit()
+    print(f"[+] System user added with role system.")
+
+    
+
 def remove_user_prompt():
     db = get_db_session()
     username = input("Username to remove: ").strip()
@@ -80,8 +96,9 @@ def main_menu():
         print("1. Create database")
         print("2. Seed default users (alice, bob)")
         print("3. Add a new user")
-        print("4. Remove a user")
-        print("5. Exit")
+        print("4. Add system user")
+        print("5. Remove a user")
+        print("6. Exit")
         choice = input("Select an option: ").strip()
 
         if choice == "1":
@@ -91,8 +108,10 @@ def main_menu():
         elif choice == "3":
             add_user_prompt()
         elif choice == "4":
-            remove_user_prompt()
+            add_system_user_prompt()
         elif choice == "5":
+            remove_user_prompt()
+        elif choice == "6":
             print("Bye!")
             break
         else:

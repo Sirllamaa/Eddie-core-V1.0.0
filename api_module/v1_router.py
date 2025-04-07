@@ -5,6 +5,9 @@ from auth_module.auth_handler import create_access_token, get_current_user
 from auth_module.auth_models import Token, User
 from auth_module.user_store import authenticate_user
 from core_logic.query_handler import query
+from core_logic.embedding_generator import EmbeddingGenerator
+from core_logic.memory_local import extract_memory_from_llm as extract_memory_from_llm_local
+from core_logic.memory_cloud import extract_memory_from_llm as extract_memory_from_llm_cloud
 from config import USER_AUTH_KEY, USER_AUTH_ALGORITHM
 from jose import JWTError, jwt
 from pydantic import BaseModel
@@ -65,7 +68,13 @@ async def process_input(
 ):
     try:
         payload = jwt.decode(token, USER_AUTH_KEY, algorithms=[USER_AUTH_ALGORITHM])
-        result = query(request.input_text)
+        result = query(request.input_text) # get response
+        memory_summary = extract_memory_from_llm_cloud(request.input_text, result) # get memory summary
+        embedder = EmbeddingGenerator(token=token) # instantiate embedding generator
+        embedding = embedder.generate(memory_summary) # get embedding
+        embedder.send_to_eddie_store(memory_summary, embedding, metadata={"username": payload["sub"]}) # send to eddie store
+        print(f"Memory summary: {memory_summary}")  # Debugging line
+        print(f"Response: {result}")  # Debugging line
         return {"output_text": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLaMA API error: {e}")
